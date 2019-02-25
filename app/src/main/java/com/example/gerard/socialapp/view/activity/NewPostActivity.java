@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,11 +22,15 @@ import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
@@ -63,6 +68,8 @@ public class NewPostActivity extends AppCompatActivity {
     DatabaseReference mReference;
     FirebaseUser mUser;
 
+    FirebaseFirestore db;
+
     boolean recording = false;
     private MediaRecorder mRecorder = null;
 
@@ -70,6 +77,8 @@ public class NewPostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
+
+        db = FirebaseFirestore.getInstance();
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
 
@@ -203,7 +212,12 @@ public class NewPostActivity extends AppCompatActivity {
     }
 
     private void writeNewPost(String postText, String mediaUrl) {
-        String postKey = mReference.push().getKey();
+
+
+
+
+
+        String postKey = db.getFirestoreSettings().getHost();
 
         Post post = new Post(mUser.getUid(), mUser.getDisplayName(), mUser.getPhotoUrl().toString(), postText, mediaUrl, mediaType);
         Map<String, Object> postValues = post.toMap();
@@ -213,12 +227,29 @@ public class NewPostActivity extends AppCompatActivity {
         childUpdates.put("posts/all-posts/" + postKey, true);
         childUpdates.put("posts/user-posts/" + mUser.getUid() + "/" + postKey, true);
 
-        mReference.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                finish();
-            }
-        });
+        db.collection("posts")
+                .add(childUpdates)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+
+
+
+//        mReference.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                finish();
+//            }
+//        });
     }
 
     private void uploadAndWriteNewPost(final String postText){
@@ -312,4 +343,6 @@ public class NewPostActivity extends AppCompatActivity {
             mRecorder = null;
         }
     }
+
+
 }

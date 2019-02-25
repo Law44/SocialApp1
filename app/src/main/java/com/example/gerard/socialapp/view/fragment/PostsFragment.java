@@ -22,7 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-
 public class PostsFragment extends Fragment {
     public DatabaseReference mReference;
     public FirebaseUser mUser;
@@ -32,6 +31,7 @@ public class PostsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
 
+
         mReference = FirebaseDatabase.getInstance().getReference();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -39,6 +39,7 @@ public class PostsFragment extends Fragment {
                 .setIndexedQuery(setQuery(), mReference.child("posts/data"), Post.class)
                 .setLifecycleOwner(this)
                 .build();
+
 
         RecyclerView recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
