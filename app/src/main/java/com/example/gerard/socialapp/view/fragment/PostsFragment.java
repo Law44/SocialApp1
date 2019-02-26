@@ -63,7 +63,7 @@ public class PostsFragment extends Fragment {
 //                .build();
 //
         FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
-                .setQuery(query,Post.class)
+                .setQuery(setQuery(),Post.class)
                 .setLifecycleOwner(this)
                 .build();
 
@@ -134,15 +134,8 @@ public class PostsFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        adapter.startListening();
+    Query setQuery(){
+        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
 }

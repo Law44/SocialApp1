@@ -71,7 +71,6 @@ public class NewPostActivity extends AppCompatActivity {
 
     DatabaseReference mReference;
     FirebaseUser mUser;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY HH:mm");
 
     FirebaseFirestore db;
 
@@ -218,10 +217,6 @@ public class NewPostActivity extends AppCompatActivity {
 
     private void writeNewPost(String postText, String mediaUrl) {
 
-
-
-
-
         String postKey = db.getFirestoreSettings().getHost();
         Post post = new Post(mUser.getUid(), mUser.getDisplayName(), mUser.getPhotoUrl().toString(), postText, mediaUrl, mediaType,  Calendar.getInstance().getTime());
         Map<String, Object> postValues = post.toMap();
@@ -236,7 +231,7 @@ public class NewPostActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
