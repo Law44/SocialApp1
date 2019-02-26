@@ -35,6 +35,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -67,6 +71,7 @@ public class NewPostActivity extends AppCompatActivity {
 
     DatabaseReference mReference;
     FirebaseUser mUser;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY HH:mm");
 
     FirebaseFirestore db;
 
@@ -218,8 +223,7 @@ public class NewPostActivity extends AppCompatActivity {
 
 
         String postKey = db.getFirestoreSettings().getHost();
-
-        Post post = new Post(mUser.getUid(), mUser.getDisplayName(), mUser.getPhotoUrl().toString(), postText, mediaUrl, mediaType);
+        Post post = new Post(mUser.getUid(), mUser.getDisplayName(), mUser.getPhotoUrl().toString(), postText, mediaUrl, mediaType,  Calendar.getInstance().getTime());
         Map<String, Object> postValues = post.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();

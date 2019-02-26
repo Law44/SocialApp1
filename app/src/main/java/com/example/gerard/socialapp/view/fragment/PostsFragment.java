@@ -54,10 +54,7 @@ public class PostsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
 
-        Query query = db.collection("posts").orderBy("author");
-
-
-
+        Query query = db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
 
 
 //        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Post>()
