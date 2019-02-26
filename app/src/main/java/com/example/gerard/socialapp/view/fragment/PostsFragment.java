@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,11 +32,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.util.Map;
+
 
 public class PostsFragment extends Fragment {
     public DatabaseReference mReference;
     public FirebaseUser mUser;
     FirebaseFirestore db;
+    FirestoreRecyclerAdapter adapter;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,9 +52,9 @@ public class PostsFragment extends Fragment {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         db = FirebaseFirestore.getInstance();
-        CollectionReference posts = db.collection("posts");
 
-        Query query = posts.limit(3);
+
+        Query query = db.collection("posts").orderBy("author");
 
 
 
@@ -67,7 +72,8 @@ public class PostsFragment extends Fragment {
 
         RecyclerView recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recycler.setAdapter(new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
+        adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
+
             @Override
             public PostViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
@@ -76,7 +82,6 @@ public class PostsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(final PostViewHolder viewHolder, int position, final Post post) {
-
 
                 viewHolder.author.setText(post.author);
                 GlideApp.with(PostsFragment.this).load(post.authorPhotoUrl).circleCrop().into(viewHolder.photo);
@@ -127,8 +132,20 @@ public class PostsFragment extends Fragment {
 //                    }
 //                });
             }
-        });
-
+        };
+        recycler.setAdapter(adapter);
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 }

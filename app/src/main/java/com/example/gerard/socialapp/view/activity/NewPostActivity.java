@@ -228,7 +228,7 @@ public class NewPostActivity extends AppCompatActivity {
         childUpdates.put("posts/user-posts/" + mUser.getUid() + "/" + postKey, true);
 
         db.collection("posts")
-                .add(childUpdates)
+                .add(post)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
