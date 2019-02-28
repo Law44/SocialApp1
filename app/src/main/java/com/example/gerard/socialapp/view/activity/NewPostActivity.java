@@ -71,7 +71,7 @@ public class NewPostActivity extends AppCompatActivity {
 
     DatabaseReference mReference;
     FirebaseUser mUser;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY HH:mm");
+
 
     FirebaseFirestore db;
 
@@ -218,18 +218,9 @@ public class NewPostActivity extends AppCompatActivity {
 
     private void writeNewPost(String postText, String mediaUrl) {
 
-
-
-
-
         String postKey = db.getFirestoreSettings().getHost();
         Post post = new Post(mUser.getUid(), mUser.getDisplayName(), mUser.getPhotoUrl().toString(), postText, mediaUrl, mediaType,  Calendar.getInstance().getTime());
         Map<String, Object> postValues = post.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("posts/data/" + postKey, postValues);
-        childUpdates.put("posts/all-posts/" + postKey, true);
-        childUpdates.put("posts/user-posts/" + mUser.getUid() + "/" + postKey, true);
 
         db.collection("posts")
                 .add(post)

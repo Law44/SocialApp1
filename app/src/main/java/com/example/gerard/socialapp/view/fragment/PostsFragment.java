@@ -40,6 +40,7 @@ public class PostsFragment extends Fragment {
     public FirebaseUser mUser;
     FirebaseFirestore db;
     FirestoreRecyclerAdapter adapter;
+    RecyclerView recycler;
 
 
     @Override
@@ -54,7 +55,7 @@ public class PostsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
 
-        Query query = db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
+
 
 
 //        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Post>()
@@ -63,11 +64,11 @@ public class PostsFragment extends Fragment {
 //                .build();
 //
         FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
-                .setQuery(query,Post.class)
+                .setQuery(setQuery(),Post.class)
                 .setLifecycleOwner(this)
                 .build();
 
-        RecyclerView recycler = view.findViewById(R.id.rvPosts);
+        recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
 
@@ -75,6 +76,13 @@ public class PostsFragment extends Fragment {
             public PostViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
                 return new PostViewHolder(inflater.inflate(R.layout.item_post, viewGroup, false));
+            }
+
+            @Override
+            public void onDataChanged() {
+                super.onDataChanged();
+                recycler.scrollToPosition(adapter.getItemCount()-1);
+                recycler.scrollToPosition(0);
             }
 
             @Override
@@ -120,6 +128,7 @@ public class PostsFragment extends Fragment {
 //                    @Override
 //                    public void onClick(View view) {
 //                        if (post.likes.containsKey(mUser.getUid())) {
+//                            db.
 //                            mReference.child("posts/data").child(postKey).child("likes").child(mUser.getUid()).setValue(null);
 //                            mReference.child("posts/user-likes").child(mUser.getUid()).child(postKey).setValue(null);
 //                        } else {
@@ -133,16 +142,8 @@ public class PostsFragment extends Fragment {
         recycler.setAdapter(adapter);
         return view;
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        adapter.startListening();
+    Query setQuery(){
+        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
 }
