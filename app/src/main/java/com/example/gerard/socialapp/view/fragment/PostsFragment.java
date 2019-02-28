@@ -15,6 +15,7 @@ import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.example.gerard.socialapp.view.PostViewHolder;
 import com.example.gerard.socialapp.view.activity.MediaActivity;
+import com.example.gerard.socialapp.view.activity.PostsActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -35,12 +36,13 @@ import com.google.firebase.firestore.Query;
 import java.util.Map;
 
 
-public class PostsFragment extends Fragment {
+public class PostsFragment extends Fragment implements PostsActivity.QueryChangeListener {
     public DatabaseReference mReference;
     public FirebaseUser mUser;
     FirebaseFirestore db;
     FirestoreRecyclerAdapter adapter;
     RecyclerView recycler;
+    FirestoreRecyclerOptions<Post> options;
 
 
     @Override
@@ -53,23 +55,39 @@ public class PostsFragment extends Fragment {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         db = FirebaseFirestore.getInstance();
-
-
-
-
-
-//        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Post>()
-//                .setIndexedQuery(query, mReference.child("posts/data"), Post.class)
-//                .setLifecycleOwner(this)
-//                .build();
-//
-        FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
-                .setQuery(setQuery(),Post.class)
-                .setLifecycleOwner(this)
-                .build();
-
         recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.onQueryChange("");
+        return view;
+    }
+
+
+    Query setQuery(){
+        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
+    }
+
+
+    Query setSearchQuery(String query){
+        return  db.collection("posts").whereEqualTo("author", query).orderBy("date", Query.Direction.DESCENDING);
+    }
+
+
+    @Override
+    public void onQueryChange(String query) {
+
+        if (query.isEmpty()) {
+            options = new FirestoreRecyclerOptions.Builder<Post>()
+                    .setQuery(setQuery(),Post.class)
+                    .setLifecycleOwner(this)
+                    .build();
+        } else {
+            options = new FirestoreRecyclerOptions.Builder<Post>()
+                    .setQuery(setSearchQuery(query), Post.class)
+                    .setLifecycleOwner(this)
+                    .build();
+        }
+
+
         adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
 
             @Override
@@ -124,26 +142,9 @@ public class PostsFragment extends Fragment {
 
                 viewHolder.numLikes.setText(String.valueOf(post.likes.size()));
 
-//                viewHolder.likeLayout.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        if (post.likes.containsKey(mUser.getUid())) {
-//                            db.
-//                            mReference.child("posts/data").child(postKey).child("likes").child(mUser.getUid()).setValue(null);
-//                            mReference.child("posts/user-likes").child(mUser.getUid()).child(postKey).setValue(null);
-//                        } else {
-//                            mReference.child("posts/data").child(postKey).child("likes").child(mUser.getUid()).setValue(true);
-//                            mReference.child("posts/user-likes").child(mUser.getUid()).child(postKey).setValue(true);
-//                        }
-//                    }
-//                });
             }
         };
         recycler.setAdapter(adapter);
-        return view;
-    }
-    Query setQuery(){
-        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
-    }
 
+    }
 }

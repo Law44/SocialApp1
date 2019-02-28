@@ -227,7 +227,7 @@ public class NewPostActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
