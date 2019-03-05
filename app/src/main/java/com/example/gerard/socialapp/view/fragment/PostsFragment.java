@@ -21,22 +21,16 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.Map;
 
 
-public class PostsFragment extends Fragment implements PostsActivity.QueryChangeListener {
+public abstract class PostsFragment extends Fragment implements PostsActivity.QueryChangeListener {
     public DatabaseReference mReference;
     public FirebaseUser mUser;
     FirebaseFirestore db;
@@ -87,7 +81,8 @@ public class PostsFragment extends Fragment implements PostsActivity.QueryChange
                     .build();
         }
 
-
+        recycler = view.findViewById(R.id.rvPosts);
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
 
             @Override
@@ -104,7 +99,7 @@ public class PostsFragment extends Fragment implements PostsActivity.QueryChange
             }
 
             @Override
-            protected void onBindViewHolder(final PostViewHolder viewHolder, int position, final Post post) {
+            protected void onBindViewHolder(final PostViewHolder viewHolder, final int position, final Post post) {
 
                 viewHolder.author.setText(post.author);
                 GlideApp.with(PostsFragment.this).load(post.authorPhotoUrl).circleCrop().into(viewHolder.photo);
@@ -142,9 +137,26 @@ public class PostsFragment extends Fragment implements PostsActivity.QueryChange
 
                 viewHolder.numLikes.setText(String.valueOf(post.likes.size()));
 
+
+                viewHolder.likeLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        if (!post.likes.containsKey(mUser.getUid())) {
+                            post.likes.put(FirebaseAuth.getInstance().getCurrentUser().getUid(),true);
+                            db.collection("posts").document(getSnapshots().getSnapshot(position).getId()).set(post);
+                        } else {
+                            post.likes.remove(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            db.collection("posts").document(getSnapshots().getSnapshot(position).getId()).set(post);
+                        }
+                    }
+                });
             }
         };
         recycler.setAdapter(adapter);
 
+        return view;
     }
+
+    public abstract Query setQuerymanual();
 }

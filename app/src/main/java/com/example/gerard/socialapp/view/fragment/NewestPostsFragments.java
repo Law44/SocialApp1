@@ -1,14 +1,11 @@
 package com.example.gerard.socialapp.view.fragment;
 
-import com.example.gerard.socialapp.view.activity.PostsActivity;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
 
-public class UserPostsFragment extends PostsFragment{
+public class NewestPostsFragments extends PostsFragment {
 
-    @Override
     public Query setQuerymanual(){
-        return  db.collection("posts").whereEqualTo("uid",FirebaseAuth.getInstance().getCurrentUser().getUid()).orderBy("date", Query.Direction.DESCENDING);
+        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
     }
 
     @Override
@@ -22,5 +19,4 @@ public class UserPostsFragment extends PostsFragment{
         super.onResume();
         adapter.startListening();
     }
-
 }
