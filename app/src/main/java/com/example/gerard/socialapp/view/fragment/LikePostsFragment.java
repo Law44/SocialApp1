@@ -7,7 +7,7 @@ import com.google.firebase.firestore.Query;
 public class LikePostsFragment extends PostsFragment {
 
     @Override
-    public Query setQuerymanual(){
+    public Query setQuery(){
         return  db.collection("posts").orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING).whereEqualTo("likes."+FirebaseAuth.getInstance().getCurrentUser().getUid(),true);
     }
 

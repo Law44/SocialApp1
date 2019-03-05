@@ -2,6 +2,7 @@ package com.example.gerard.socialapp.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,13 +38,14 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
     FirestoreRecyclerAdapter adapter;
     RecyclerView recycler;
     FirestoreRecyclerOptions<Post> options;
-
+    View view;
+    FloatingActionButton refresh;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_posts, container, false);
-
+        view = inflater.inflate(R.layout.fragment_posts, container, false);
+        refresh = view.findViewById(R.id.btn_refresh);
 
         mReference = FirebaseDatabase.getInstance().getReference();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -52,7 +54,10 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
         recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.onQueryChange("");
+        on
+
         return view;
+
     }
 
 
@@ -81,8 +86,7 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
                     .build();
         }
 
-        recycler = view.findViewById(R.id.rvPosts);
-        recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
 
             @Override
@@ -91,11 +95,20 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
                 return new PostViewHolder(inflater.inflate(R.layout.item_post, viewGroup, false));
             }
 
+
             @Override
             public void onDataChanged() {
                 super.onDataChanged();
-                recycler.scrollToPosition(adapter.getItemCount()-1);
-                recycler.scrollToPosition(0);
+
+               refresh.show();
+               refresh.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View view) {
+                       refresh.hide();
+                       recycler.scrollToPosition(adapter.getItemCount()-1);
+                       recycler.scrollToPosition(0);
+                   }
+               });
             }
 
             @Override
@@ -155,8 +168,8 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
         };
         recycler.setAdapter(adapter);
 
-        return view;
+
     }
 
-    public abstract Query setQuerymanual();
+
 }

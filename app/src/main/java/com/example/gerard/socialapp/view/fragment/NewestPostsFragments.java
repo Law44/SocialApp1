@@ -4,7 +4,7 @@ import com.google.firebase.firestore.Query;
 
 public class NewestPostsFragments extends PostsFragment {
 
-    public Query setQuerymanual(){
+    public Query setQuery(){
         return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
     }
 

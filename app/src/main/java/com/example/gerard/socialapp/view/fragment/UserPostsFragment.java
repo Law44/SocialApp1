@@ -7,7 +7,7 @@ import com.google.firebase.firestore.Query;
 public class UserPostsFragment extends PostsFragment{
 
     @Override
-    public Query setQuerymanual(){
+    public Query setQuery(){
         return  db.collection("posts").whereEqualTo("uid",FirebaseAuth.getInstance().getCurrentUser().getUid()).orderBy("date", Query.Direction.DESCENDING);
     }
 
