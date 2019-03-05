@@ -16,6 +16,7 @@ public class Post {
     public String mediaType;
     public Date date;
     public Map<String, Boolean> likes = new HashMap<>();
+    public String doc;
 
     public Post() {}
 

@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.example.gerard.socialapp.GlideApp;
 import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.view.fragment.LikePostsFragment;
+import com.example.gerard.socialapp.view.fragment.NewestPostsFragments;
 import com.example.gerard.socialapp.view.fragment.PostsFragment;
 import com.example.gerard.socialapp.view.fragment.UserPostsFragment;
 import com.firebase.ui.auth.AuthUI;
@@ -161,10 +162,10 @@ public class PostsActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             switch (position){
-                case 0: return new PostsFragment();
+                case 0: return new NewestPostsFragments();
                 case 1: return new LikePostsFragment();
                 case 2: return new UserPostsFragment();
-                default: return new PostsFragment();
+                default: return new NewestPostsFragments();
             }
         }
 

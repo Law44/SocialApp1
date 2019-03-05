@@ -15,27 +15,17 @@ import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.example.gerard.socialapp.view.PostViewHolder;
 import com.example.gerard.socialapp.view.activity.MediaActivity;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.Map;
 
-
-public class PostsFragment extends Fragment {
+public abstract class PostsFragment extends Fragment {
     public DatabaseReference mReference;
     public FirebaseUser mUser;
     FirebaseFirestore db;
@@ -54,22 +44,18 @@ public class PostsFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-
-
-
-
 //        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Post>()
 //                .setIndexedQuery(query, mReference.child("posts/data"), Post.class)
 //                .setLifecycleOwner(this)
 //                .build();
 //
         FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
-                .setQuery(setQuery(),Post.class)
-                .setLifecycleOwner(this)
+                .setQuery(setQuerymanual(), Post.class)
                 .build();
 
         recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         adapter = new FirestoreRecyclerAdapter<Post, PostViewHolder>(options) {
 
             @Override
@@ -86,8 +72,9 @@ public class PostsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(final PostViewHolder viewHolder, int position, final Post post) {
+            protected void onBindViewHolder(final PostViewHolder viewHolder, final int position, final Post post) {
 
+                Log.e("abc",">>>"+getSnapshots().getSnapshot(position).getId());
                 viewHolder.author.setText(post.author);
                 GlideApp.with(PostsFragment.this).load(post.authorPhotoUrl).circleCrop().into(viewHolder.photo);
 
@@ -124,26 +111,26 @@ public class PostsFragment extends Fragment {
 
                 viewHolder.numLikes.setText(String.valueOf(post.likes.size()));
 
-//                viewHolder.likeLayout.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        if (post.likes.containsKey(mUser.getUid())) {
-//                            db.
-//                            mReference.child("posts/data").child(postKey).child("likes").child(mUser.getUid()).setValue(null);
-//                            mReference.child("posts/user-likes").child(mUser.getUid()).child(postKey).setValue(null);
-//                        } else {
-//                            mReference.child("posts/data").child(postKey).child("likes").child(mUser.getUid()).setValue(true);
-//                            mReference.child("posts/user-likes").child(mUser.getUid()).child(postKey).setValue(true);
-//                        }
-//                    }
-//                });
+
+                viewHolder.likeLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        if (!post.likes.containsKey(mUser.getUid())) {
+                            post.likes.put(FirebaseAuth.getInstance().getCurrentUser().getUid(),true);
+                            db.collection("posts").document(getSnapshots().getSnapshot(position).getId()).set(post);
+                        } else {
+                            post.likes.remove(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            db.collection("posts").document(getSnapshots().getSnapshot(position).getId()).set(post);
+                        }
+                    }
+                });
             }
         };
         recycler.setAdapter(adapter);
+
         return view;
     }
-    Query setQuery(){
-        return  db.collection("posts").orderBy("date", Query.Direction.DESCENDING);
-    }
 
+    public abstract Query setQuerymanual();
 }

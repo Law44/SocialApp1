@@ -6,7 +6,19 @@ import com.google.firebase.firestore.Query;
 public class UserPostsFragment extends PostsFragment {
 
     @Override
-    Query setQuery(){
-        return  db.collection("posts").orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING).whereEqualTo("uid",FirebaseAuth.getInstance().getCurrentUser().getUid());
+    public Query setQuerymanual(){
+        return  db.collection("posts").whereEqualTo("uid",FirebaseAuth.getInstance().getCurrentUser().getUid()).orderBy("date", Query.Direction.DESCENDING);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.startListening();
     }
 }
