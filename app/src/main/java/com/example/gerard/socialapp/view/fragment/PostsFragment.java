@@ -67,6 +67,7 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == 0){
                     refresh.setVisibility(View.INVISIBLE);
+                    nuevos = 0;
                 }
             }
         });
