@@ -61,8 +61,15 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
         recycler = view.findViewById(R.id.rvPosts);
         recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.onQueryChange("");
-
-
+        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == 0){
+                    refresh.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
         return view;
 
     }
