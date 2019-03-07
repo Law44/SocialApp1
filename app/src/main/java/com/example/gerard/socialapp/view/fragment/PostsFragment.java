@@ -46,6 +46,7 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
     View view;
     Button refresh;
     int nuevos;
+    boolean firstTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -105,12 +106,19 @@ public abstract class PostsFragment extends Fragment implements PostsActivity.Qu
             public void onChildChanged(@NonNull ChangeEventType type, @NonNull DocumentSnapshot snapshot, int newIndex, int oldIndex) {
                 super.onChildChanged(type, snapshot, newIndex, oldIndex);
                 if (type == ChangeEventType.ADDED){
-                    if (recycler.canScrollVertically(2)) {
+                    if (recycler.canScrollVertically(View.SCROLL_AXIS_VERTICAL)) {
+                        nuevos++;
                         refresh.setVisibility(View.VISIBLE);
-                        refresh.setText(String.valueOf(newIndex-oldIndex));
+                        if (nuevos > 1){
+                            refresh.setText(String.valueOf(nuevos + " tweets nuevos"));
+                        }
+                        else {
+                            refresh.setText(String.valueOf(nuevos + " tweet nuevo"));
+                        }
                         refresh.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                nuevos = 0;
                                 refresh.setVisibility(View.INVISIBLE);
                                 recycler.scrollToPosition(adapter.getItemCount() - 1);
                                 recycler.scrollToPosition(0);
